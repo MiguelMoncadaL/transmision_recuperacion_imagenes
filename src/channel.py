@@ -32,3 +32,46 @@ def add_salt_pepper(image, prob=0.05, seed=None):
     return noisy
 
 
+def image_to_bits(image):
+    """Convierte la imagen en un flujo de bits (8 bits por valor)."""
+    return np.unpackbits(image.reshape(-1))
+
+
+def bits_to_image(bits, shape):
+    """Reconstruye la imagen a partir de un flujo de bits."""
+    return np.packbits(bits).reshape(shape)
+
+
+def binary_symmetric_channel(bits, p=0.01, seed=None):
+    """Canal binario simétrico: cada bit se invierte con probabilidad p."""
+    rng = np.random.default_rng(seed)
+    flips = (rng.random(size=bits.shape) < p).astype(np.uint8)
+    return bits ^ flips
+
+
+def transmit_bits(image, p=0.01, seed=None):
+    """Transmisión digital completa: imagen -> bits -> canal binario ruidoso
+    -> bits recibidos -> imagen recibida.
+
+    Devuelve (imagen_recibida, bits_enviados, bits_recibidos).
+    """
+    sent = image_to_bits(image)
+    received = binary_symmetric_channel(sent, p=p, seed=seed)
+    return bits_to_image(received, image.shape), sent, received
+
+
+def transmit(image, channel="awgn", param=None, seed=None):
+    """Envía una imagen por el canal elegido y devuelve la imagen recibida.
+
+    channel: 'awgn', 'salt_pepper' o 'bsc'
+    param:   sigma (awgn), probabilidad (salt_pepper) o probabilidad de
+             error de bit (bsc). Si es None se usa un valor por defecto.
+    """
+    if channel == "awgn":
+        return add_awgn(image, sigma=20.0 if param is None else param, seed=seed)
+    if channel == "salt_pepper":
+        return add_salt_pepper(image, prob=0.05 if param is None else param, seed=seed)
+    if channel == "bsc":
+        received, _, _ = transmit_bits(image, p=0.01 if param is None else param, seed=seed)
+        return received
+    raise ValueError(f"Canal desconocido: {channel}")
