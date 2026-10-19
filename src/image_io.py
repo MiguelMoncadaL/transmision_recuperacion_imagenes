@@ -1,6 +1,8 @@
 """Lectura, representación numérica y visualización de imágenes."""
 from pathlib import Path
 
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
@@ -36,4 +38,30 @@ def describe_image(array):
     }
 
 
+def show_comparison(original, received, title_received="Imagen recibida",
+                    save_path=None, show=True):
+    """Muestra lado a lado la imagen original, la recibida y su diferencia."""
+    if not show:
+        matplotlib.use("Agg")
+
+    diff = np.abs(original.astype(np.int16) - received.astype(np.int16))
+    diff = diff.astype(np.uint8)
+    cmap = "gray" if original.ndim == 2 else None
+
+    fig, axes = plt.subplots(1, 3, figsize=(13, 5), layout="constrained")
+    axes[0].imshow(original, cmap=cmap, vmin=0, vmax=255)
+    axes[0].set_title("Imagen original")
+    axes[1].imshow(received, cmap=cmap, vmin=0, vmax=255)
+    axes[1].set_title(title_received)
+    axes[2].imshow(diff, cmap=cmap, vmin=0, vmax=255)
+    axes[2].set_title("Diferencia absoluta")
+    for ax in axes:
+        ax.axis("off")
+
+    if save_path:
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(save_path, dpi=120)
+    if show:
+        plt.show()
+    plt.close(fig)
 
