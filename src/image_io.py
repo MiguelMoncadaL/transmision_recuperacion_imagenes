@@ -20,6 +20,19 @@ def load_image(path, grayscale=False):
     return np.array(img, dtype=np.uint8)
 
 
+def to_gray(image):
+    """Convierte una imagen RGB a escala de grises (luminancia).
+
+    Si la imagen ya es 2D se devuelve igual. Se usa para analizar una sola
+    señal de intensidad por imagen (por ejemplo, el perfil de una fila).
+    """
+    if image.ndim == 2:
+        return image
+    pesos = np.array([0.299, 0.587, 0.114])
+    return (image[..., :3] @ pesos).round().astype(np.uint8)
+
+
+
 def save_image(array, path):
     """Guarda un arreglo uint8 como archivo de imagen."""
     Path(path).parent.mkdir(parents=True, exist_ok=True)
