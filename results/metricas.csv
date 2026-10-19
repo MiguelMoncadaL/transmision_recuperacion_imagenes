@@ -1,0 +1,5 @@
+imagen,canal,parametro,MSE,PSNR_dB,SNR_dB,media_error,desv_error,pct_alteradas
+reloj (grises),awgn,25.0,556.93,20.67,18.32,-0.83,23.58,98.29
+reloj (grises),salt_pepper,0.05,1152.7,17.51,15.16,-3.03,33.82,5.0
+reloj (grises),bsc,0.01,208.94,24.93,22.58,-1.18,14.41,7.82
+casa (color),awgn,25.0,614.38,20.25,15.62,-0.25,24.79,98.27
