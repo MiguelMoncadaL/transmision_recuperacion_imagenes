@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+
 def load_image(path, grayscale=False):
     """Lee cualquier imagen (PNG, JPG, TIFF, BMP...) y la devuelve como
     arreglo NumPy de enteros de 8 bits (uint8).
@@ -31,6 +32,32 @@ def to_gray(image):
     pesos = np.array([0.299, 0.587, 0.114])
     return (image[..., :3] @ pesos).round().astype(np.uint8)
 
+
+def choose_image_file(initial_dir="data"):
+    """Abre una ventana para elegir una imagen desde el computador.
+
+    Devuelve la ruta elegida, o None si el usuario cancela. Si el sistema no
+    tiene interfaz gráfica (tkinter), pide la ruta por la consola.
+    """
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)  # que la ventana aparezca al frente
+        carpeta = initial_dir if Path(initial_dir).is_dir() else "."
+        ruta = filedialog.askopenfilename(
+            initialdir=carpeta,
+            title="Selecciona la imagen que quieres transmitir",
+            filetypes=[("Imágenes", "*.png *.jpg *.jpeg *.bmp *.tif *.tiff *.gif *.webp"),
+                       ("Todos los archivos", "*.*")],
+        )
+        root.destroy()
+        return ruta or None
+    except Exception:
+        ruta = input("Ruta de la imagen que quieres transmitir: ").strip().strip('"')
+        return ruta or None
 
 
 def save_image(array, path):
@@ -77,4 +104,3 @@ def show_comparison(original, received, title_received="Imagen recibida",
     if show:
         plt.show()
     plt.close(fig)
-
